@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  password    String
+  firstName   String
+  lastName    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  roles       String[]     @default(["user"])
+  parkinglots ParkingLot[]
+
+  @@map("users")
+}
+
+model ParkingLot {
+  id            Int      @id @default(autoincrement())
+  name          String
+  totalCapacity Int
+  ratePerHour   Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  slots         Slot[]
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  @@map("parking_lots")
+}
+
+model Slot {
+  id           Int       @id @default(autoincrement())
+  number       String
+  status       String    @default("available")
+  ticketNumber String?   @unique
+  timeIn       DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  parkingLotId Int
+  parkingLot   ParkingLot    @relation(fields: [parkingLotId], references: [id])
+  reservations Reservation[]
+
+  @@map("slots")
+}
+
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  slotId    Int
+  slot      Slot     @relation(fields: [slotId], references: [id])
+
+  @@map("reservations")
+}
