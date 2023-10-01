@@ -11,30 +11,27 @@ datasource db {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  password    String
-  firstName   String
-  lastName    String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  roles       String[]     @default(["user"])
-  parkinglots ParkingLot[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roles     String[] @default(["user"])
 
   @@map("users")
 }
 
 model ParkingLot {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   name          String
   totalCapacity Int
   ratePerHour   Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   slots         Slot[]
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  revenues      Revenue[]
 
   @@map("parking_lots")
 }
@@ -63,4 +60,14 @@ model Reservation {
   slot      Slot     @relation(fields: [slotId], references: [id])
 
   @@map("reservations")
+}
+
+model Revenue {
+  id           Int        @id @default(autoincrement())
+  amount       Float
+  createdAt    DateTime   @default(now())
+  parkingLotId Int
+  parkingLot   ParkingLot @relation(fields: [parkingLotId], references: [id])
+
+  @@map("revenues")
 }

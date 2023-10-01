@@ -3,14 +3,6 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class LotDto {
   @ApiProperty({
-    example: '1',
-    description: 'The id of the user who owns the lot',
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  userId: number;
-
-  @ApiProperty({
     example: 'Park and Ride',
     description: 'The name of the parking lot',
   })

@@ -24,7 +24,7 @@ export class AuthController {
     return this.authService.signIn(signInDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard) //DOCU: Adding the @UseGuards() decorator to the controller will apply the AuthGuard and RolesGuard to all endpoints.
   @Roles('user')
   @Get('profile')
   getProfile(@Request() req) {

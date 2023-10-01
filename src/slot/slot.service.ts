@@ -7,6 +7,18 @@ export class SlotService {
   constructor(private prisma: PrismaService) {}
 
   async createSlot(createSlotDto: CreateSlotDto) {
+    //DOCU: Increment the total capacity of the parking lot by 1.
+    await this.prisma.parkingLot.update({
+      where: {
+        id: createSlotDto.parkingLotId,
+      },
+      data: {
+        totalCapacity: {
+          increment: 1,
+        },
+      },
+    });
+
     return this.prisma.slot.create({
       data: createSlotDto,
     });

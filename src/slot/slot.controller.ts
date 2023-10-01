@@ -5,16 +5,27 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AvailSlotDto, CreateSlotDto } from './dto';
 import { SlotService } from './slot.service';
 import { DecimalPlacesPipe } from 'src/common/pipes/decimal-places.pipe';
+import { AuthGuard } from 'src/auth/guard/auth.guards';
+import { RolesGuard } from 'src/auth/guard/role.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RevenueService } from 'src/revenue/revenue.service';
 
 @Controller('slot')
 @ApiTags('slot')
+@UseGuards(AuthGuard, RolesGuard)
+@Roles('user', 'admin')
+@ApiBearerAuth()
 export class SlotController {
-  constructor(private slotService: SlotService) {}
+  constructor(
+    private slotService: SlotService,
+    private revenueService: RevenueService,
+  ) {}
 
   @Post('create')
   createSlot(@Body() createSlotDto: CreateSlotDto) {
@@ -44,6 +55,11 @@ export class SlotController {
     const slot = await this.slotService.searchSlotByTicketNumber(ticketNumber);
     const feeDetails = await this.calculateFee(ticketNumber);
     await this.slotService.unavailSlot(slot.id);
+
+    await this.revenueService.addRevenue({
+      amount: feeDetails.totalFee,
+      parkingLotId: slot.parkingLotId,
+    });
 
     return {
       Message: 'Thank you for parking with us',
